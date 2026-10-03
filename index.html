@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barche LNI Firenze-Prato e Pistoia</title>
+<style>
+  :root { --bg:#f3f6f8; --ink:#12263a; --accent:#0b5c8a; --line:#c9d4dc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: .75rem 1rem; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 1; }
+  h1 { font-size: 1.1rem; margin: 0 auto 0 0; }
+  label { display: flex; gap: .4rem; align-items: center; font-size: .9rem; }
+  button { font: inherit; padding: .45rem .8rem; border: 0; border-radius: 6px; background: var(--accent); color: #fff; cursor: pointer; }
+  #grid { display: grid; gap: 1rem; padding: 1rem; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+  .card h2 { font-size: 1rem; margin: 0; padding: .6rem .8rem; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: .5rem; }
+  .card h2 span { font-weight: 400; color: #5a6b7b; font-size: .85rem; }
+  .card iframe { width: 100%; height: 380px; border: 0; display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Barche LNI Firenze-Prato e Pistoia</h1>
+  <label><input type="checkbox" id="track" checked> Traccia ultime 24 ore</label>
+  <button id="reload">Aggiorna</button>
+</header>
+<div id="grid"></div>
+
+<script>
+// Per aggiungere una barca: una riga { nome, mmsi }
+const BARCHE = [
+  { nome: "Dollie",        mmsi: "247522780" },
+  { nome: "SuperKalimera", mmsi: "247382920" },
+  { nome: "Fylla", mmsi: "247523780" },
+  { nome: "DREAM AWAY", mmsi: "247063670" },
+  { nome: "Fanny", mmsi: "247540050" },
+  
+];
+
+const grid = document.getElementById("grid");
+
+function documento(b, track) {
+  return `<!DOCTYPE html><html><body style="margin:0">
+    <script>
+      var width="100%"; var height="380";
+      var names=true; var mmsi="${b.mmsi}"; var show_track=${track};
+    <\/script>
+    <script src="https://www.vesselfinder.com/aismap.js"><\/script>
+  </body></html>`;
+}
+
+function disegna() {
+  const track = document.getElementById("track").checked;
+  grid.innerHTML = "";
+  BARCHE.forEach(b => {
+    const card = document.createElement("section");
+    card.className = "card";
+    card.innerHTML = `<h2>${b.nome} <span>MMSI ${b.mmsi}</span></h2>`;
+    const f = document.createElement("iframe");
+    f.title = "Mappa " + b.nome;
+    f.srcdoc = documento(b, track);
+    card.appendChild(f);
+    grid.appendChild(card);
+  });
+}
+document.getElementById("track").addEventListener("change", disegna);
+document.getElementById("reload").addEventListener("click", disegna);
+disegna();
+</script>
+</body>
+</html>
