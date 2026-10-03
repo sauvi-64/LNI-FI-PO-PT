@@ -16,6 +16,7 @@
   .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
   .card h2 { font-size: 1rem; margin: 0; padding: .6rem .8rem; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: .5rem; }
   .card h2 span { font-weight: 400; color: #5a6b7b; font-size: .85rem; }
+  .card a { display: block; padding: .55rem .8rem; border-top: 1px solid var(--line); color: var(--accent); font-size: .9rem; }
   .card iframe { width: 100%; height: 380px; border: 0; display: block; }
 </style>
 </head>
@@ -32,10 +33,9 @@
 const BARCHE = [
   { nome: "Dollie",        mmsi: "247522780" },
   { nome: "SuperKalimera", mmsi: "247382920" },
-  { nome: "Fylla", mmsi: "247523780" },
-  { nome: "DREAM AWAY", mmsi: "247063670" },
-  { nome: "Fanny", mmsi: "247540050" },
-  
+  { nome: "Fylla",         mmsi: "247523780" },
+  { nome: "DREAM AWAY",    mmsi: "247063670" },
+  { nome: "Fanny",         mmsi: "247540050" }
 ];
 
 const grid = document.getElementById("grid");
@@ -61,6 +61,12 @@ function disegna() {
     f.title = "Mappa " + b.nome;
     f.srcdoc = documento(b, track);
     card.appendChild(f);
+    const a = document.createElement("a");
+    a.href = "https://www.vesselfinder.com/?mmsi=" + b.mmsi;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "Dettagli su VesselFinder (velocità, ora ultimo segnale)";
+    card.appendChild(a);
     grid.appendChild(card);
   });
 }
