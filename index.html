@@ -1,34 +1,78 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Flotta LNI Firenze–Prato e Pistoia | VHF 72</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barche LNI Firenze-Prato e Pistoia - VHF CH 72</title>
 <style>
-:root{--navy:#123653;--blue:#08638b;--pale:#eef5f8;--line:#d9e3e9;--ink:#20394b}*{box-sizing:border-box}body{margin:0;background:#f1f5f7;color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}header{background:var(--navy);color:white;padding:20px max(18px,calc((100vw - 1400px)/2));}header h1{margin:0;font-size:clamp(1.35rem,2.4vw,2rem)}header p{margin:5px 0 0;color:#d3e7f2}.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:14px max(18px,calc((100vw - 1400px)/2));background:white;border-bottom:1px solid var(--line)}button,.action{display:inline-block;background:var(--blue);color:white;border:0;border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer;text-decoration:none}button:hover,.action:hover{background:#074765}.toolbar label{display:flex;align-items:center;gap:7px}.toolbar small{color:#526776}.grid{max-width:1436px;margin:auto;padding:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px}.card{background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 3px 13px #1236530b}.card-head{padding:17px 18px 12px;display:flex;justify-content:space-between;align-items:start;gap:12px}.card h2{margin:0;color:var(--navy);font-size:1.35rem}.sub{font-size:.85rem;color:#5a7282}.pill{white-space:nowrap;font-size:.76rem;border:1px solid #b9d7e5;background:var(--pale);color:var(--blue);border-radius:99px;padding:4px 9px}.map{width:100%;height:340px;border:0;display:block;background:#e4eef3}.content{padding:0 18px 18px}h3{font-size:1rem;color:var(--navy);margin:17px 0 8px;border-bottom:1px solid var(--line);padding-bottom:5px}.facts{display:grid;grid-template-columns:1fr 1fr;gap:9px 16px}.fact{min-width:0}.fact .k{font-size:.77rem;color:#657d8e;display:block}.fact .v{font-size:.95rem;font-weight:600;overflow-wrap:anywhere}.muted{font-weight:400!important;color:#8798a3}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.action.secondary{background:#e7f0f5;color:var(--navy)}.note{font-size:.78rem;color:#627787;margin:11px 0 0}.intro{max-width:1400px;margin:16px auto 0;padding:0 18px;color:#496476}footer{padding:20px;text-align:center;color:#627787;font-size:.82rem}@media(max-width:520px){.map{height:290px}.facts{gap:10px}.grid{padding:10px}}
+  :root { --bg:#f3f6f8; --ink:#12263a; --accent:#0b5c8a; --line:#c9d4dc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: .75rem 1rem; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 1; }
+  h1 { font-size: 1.1rem; margin: 0 auto 0 0; }
+  label { display: flex; gap: .4rem; align-items: center; font-size: .9rem; }
+  button { font: inherit; padding: .45rem .8rem; border: 0; border-radius: 6px; background: var(--accent); color: #fff; cursor: pointer; }
+  #grid { display: grid; gap: 1rem; padding: 1rem; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+  .card h2 { font-size: 1rem; margin: 0; padding: .6rem .8rem; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: .5rem; }
+  .card h2 span { font-weight: 400; color: #5a6b7b; font-size: .85rem; }
+  .card a { display: block; padding: .55rem .8rem; border-top: 1px solid var(--line); color: var(--accent); font-size: .9rem; }
+  .card iframe { width: 100%; height: 380px; border: 0; display: block; }
 </style>
 </head>
 <body>
-<header><h1>⛵ Flotta LNI Firenze–Prato e Pistoia</h1><p>Le imbarcazioni della nostra comunità · Canale VHF 72</p></header>
-<div class="toolbar"><label><input type="checkbox" id="track" checked> Mostra traccia ultime 24 ore (se disponibile)</label><button id="reload">↻ Aggiorna mappe</button><small id="updated"></small></div>
-<p class="intro">Cinque imbarcazioni della flotta. Le mappe AIS sono fornite da VesselFinder; per i dati di navigazione aggiornati aprire la scheda pubblica della singola barca. I campi non confermati non vengono stimati.</p>
-<main id="grid" class="grid"></main>
-<footer>Informazioni AIS indicative e soggette a copertura e ritardi del servizio. Non utilizzare per la navigazione o per la sicurezza in mare.</footer>
+<header>
+  <h1>Barche LNI Firenze-Prato e Pistoia - VHF CH 72</h1>
+  <label><input type="checkbox" id="track" checked> Traccia ultime 24 ore</label>
+  <button id="reload">Aggiorna</button>
+</header>
+<div id="grid"></div>
+
 <script>
-/* Per arricchire le schede inserire solo informazioni confermate nei campi null.
-   Il browser non può leggere automaticamente i dati interni dell'iframe VesselFinder.
-   Per i dati AIS in tempo reale serve un'API autorizzata e un backend sicuro. */
-const BARCHE=[
- {nome:'Dollie',mmsi:'247522780'},
- {nome:'SuperKalimera',mmsi:'247382920'},
- {nome:'Fylla',mmsi:'247523780'},
- {nome:'DREAM AWAY',mmsi:'247063670'},
- {nome:'Fanny',mmsi:'247540050'}
-].map(b=>({...b,bandiera:'Italia (prefisso MMSI 247)',tipo:null,cantiere:null,modello:null,anno:null,lunghezza:null,larghezza:null,pescaggio:null,callSign:null,imo:null,portoBase:null,propulsione:null,velocita:null,rotta:null,destinazione:null,ultimoSegnale:null,coordinate:null,foto:null}));
-const grid=document.getElementById('grid');
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fact(k,v){return `<div class="fact"><span class="k">${esc(k)}</span><span class="v ${v==null?'muted':''}">${v==null?'Non disponibile':esc(v)}</span></div>`}
-function section(title,items){return `<h3>${title}</h3><div class="facts">${items.map(([k,v])=>fact(k,v)).join('')}</div>`}
-function mapDoc(mmsi,track){return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0"><script>var width="100%";var height="340";var names=true;var mmsi="${mmsi}";var show_track=${track};<\/script><script src="https://www.vesselfinder.com/aismap.js"><\/script></body></html>`}
-function render(){const track=document.getElementById('track').checked;grid.replaceChildren();BARCHE.forEach(b=>{const card=document.createElement('article');card.className='card';card.innerHTML=`<div class="card-head"><div><h2>${esc(b.nome)}</h2><div class="sub">MMSI ${esc(b.mmsi)}</div></div><span class="pill">AIS · VesselFinder</span></div>`;const frame=document.createElement('iframe');frame.className='map';frame.title='Posizione AIS di '+b.nome;frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';frame.srcdoc=mapDoc(b.mmsi,track);card.appendChild(frame);const content=document.createElement('div');content.className='content';content.innerHTML=section('Identificazione',[['Nome',b.nome],['MMSI',b.mmsi],['Bandiera / prefisso',b.bandiera],['Indicativo radio',b.callSign],['IMO (se presente)',b.imo],['Tipo di imbarcazione',b.tipo]])+section('Caratteristiche tecniche',[['Cantiere',b.cantiere],['Modello',b.modello],['Anno di costruzione',b.anno],['Lunghezza',b.lunghezza],['Larghezza',b.larghezza],['Pescaggio',b.pescaggio],['Propulsione',b.propulsione],['Porto base',b.portoBase]])+section('Navigazione AIS',[['Velocità',b.velocita],['Rotta',b.rotta],['Destinazione',b.destinazione],['Coordinate',b.coordinate],['Ultimo segnale',b.ultimoSegnale]])+`<div class="actions"><a class="action" target="_blank" rel="noopener noreferrer" href="https://www.vesselfinder.com/vessels?name=${encodeURIComponent(b.mmsi)}">Cerca MMSI su VesselFinder ↗</a><a class="action secondary" target="_blank" rel="noopener noreferrer" href="https://www.vesselfinder.com/?mmsi=${encodeURIComponent(b.mmsi)}">Apri mappa ↗</a></div><p class="note">I dati tecnici non disponibili richiedono una fonte pubblica verificata o conferma del socio. La mappa può mostrare informazioni AIS ulteriori cliccando sull'imbarcazione.</p>`;card.appendChild(content);grid.appendChild(card)});document.getElementById('updated').textContent='Mappe ricaricate: '+new Date().toLocaleTimeString('it-IT')}
-document.getElementById('track').addEventListener('change',render);document.getElementById('reload').addEventListener('click',render);render();
-</script></body></html>
+// Per aggiungere una barca: una riga { nome, mmsi }
+const BARCHE = [
+  { nome: "Dollie",        mmsi: "247522780" },
+  { nome: "SuperKalimera", mmsi: "247382920" },
+  { nome: "Fylla",         mmsi: "247523780" },
+  { nome: "DREAM AWAY",    mmsi: "247063670" },
+  { nome: "Fanny",         mmsi: "247540050" }
+];
+
+const grid = document.getElementById("grid");
+
+function documento(b, track) {
+  return `<!DOCTYPE html><html><body style="margin:0">
+    <script>
+      var width="100%"; var height="380";
+      var names=true; var mmsi="${b.mmsi}"; var show_track=${track};
+    <\/script>
+    <script src="https://www.vesselfinder.com/aismap.js"><\/script>
+  </body></html>`;
+}
+
+function disegna() {
+  const track = document.getElementById("track").checked;
+  grid.innerHTML = "";
+  BARCHE.forEach(b => {
+    const card = document.createElement("section");
+    card.className = "card";
+    card.innerHTML = `<h2>${b.nome} <span>MMSI ${b.mmsi}</span></h2>`;
+    const f = document.createElement("iframe");
+    f.title = "Mappa " + b.nome;
+    f.srcdoc = documento(b, track);
+    card.appendChild(f);
+    const a = document.createElement("a");
+    a.href = "https://www.vesselfinder.com/?mmsi=" + b.mmsi;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "Dettagli su VesselFinder (velocità, ora ultimo segnale)";
+    card.appendChild(a);
+    grid.appendChild(card);
+  });
+}
+document.getElementById("track").addEventListener("change", disegna);
+document.getElementById("reload").addEventListener("click", disegna);
+disegna();
+</script>
+</body>
+</html>
